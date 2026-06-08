@@ -3,6 +3,7 @@ package Vista;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import Modelo.Producto;
+import Vista.ingresoProducto;
 
 public class Ventas extends javax.swing.JFrame {
     
@@ -31,10 +32,9 @@ public class Ventas extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         inventarioTable = new javax.swing.JTable();
         ingresarBtn = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        actualizarBtn = new javax.swing.JButton();
+        ventaBtn = new javax.swing.JButton();
+        historialBtn = new javax.swing.JButton();
         imagenFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -43,7 +43,6 @@ public class Ventas extends javax.swing.JFrame {
 
         Logo_ferreteria.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/logo_ferre256.png"))); // NOI18N
         Fondo.add(Logo_ferreteria, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 10, 210, 120));
-        Logo_ferreteria.getAccessibleContext().setAccessibleParent(imagenFondo);
 
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
         jLabel1.setText("BIENVENIDO");
@@ -75,24 +74,21 @@ public class Ventas extends javax.swing.JFrame {
 
         ingresarBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         ingresarBtn.setText("Ingresar producto");
-        Fondo.add(ingresarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 620, -1, -1));
+        ingresarBtn.addActionListener(this::ingresarBtnActionPerformed);
+        Fondo.add(ingresarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(150, 620, -1, -1));
 
-        jButton1.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
-        jButton1.setText("Actualizar inventario");
-        Fondo.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 620, -1, -1));
+        actualizarBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
+        actualizarBtn.setText("Actualizar inventario");
+        Fondo.add(actualizarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 620, -1, -1));
 
-        jButton2.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
-        jButton2.setText("Venta");
-        jButton2.setToolTipText("");
-        Fondo.add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 620, -1, -1));
+        ventaBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
+        ventaBtn.setText("Venta");
+        ventaBtn.setToolTipText("");
+        Fondo.add(ventaBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 620, -1, -1));
 
-        jButton3.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
-        jButton3.setText("Presupuesto");
-        Fondo.add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 620, -1, -1));
-
-        jButton4.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
-        jButton4.setText("Historial de ventas");
-        Fondo.add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 620, -1, -1));
+        historialBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
+        historialBtn.setText("Historial de ventas");
+        Fondo.add(historialBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 620, -1, -1));
 
         imagenFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondoNuevo.png"))); // NOI18N
         Fondo.add(imagenFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 700));
@@ -112,20 +108,24 @@ public class Ventas extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void ingresarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresarBtnActionPerformed
+        ingresoProducto nuevoIngreso = new ingresoProducto();
+        nuevoIngreso.setVisible(true);
+    }//GEN-LAST:event_ingresarBtnActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Fondo;
     private javax.swing.JLabel Logo_ferreteria;
+    private javax.swing.JButton actualizarBtn;
     private javax.swing.JToggleButton buscarBtn;
     private javax.swing.JTextField busquedaTxt;
+    private javax.swing.JButton historialBtn;
     private javax.swing.JLabel imagenFondo;
     private javax.swing.JButton ingresarBtn;
     private javax.swing.JTable inventarioTable;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JButton ventaBtn;
     // End of variables declaration//GEN-END:variables
 }
