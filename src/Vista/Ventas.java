@@ -1,9 +1,8 @@
 package Vista;
 
-import java.awt.Dimension;
 import java.util.ArrayList;
-import Modelo.Producto;
 import javax.swing.JOptionPane;
+import Controlador.ProductoControlador;
 
 public class Ventas extends javax.swing.JFrame {
     
@@ -16,22 +15,36 @@ public class Ventas extends javax.swing.JFrame {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        
+        refrescarTablaCompleta();
+        
         this.setVisible(true);
     }
 
-    //Logica para buscar dentro de base de datos el producto entre tipo y marca
-    private ArrayList buscarProducto(String buscado){
-        Producto productoEncontrado = new Producto();
-        ArrayList<Producto> listaProductos = new ArrayList<>();
-        
-        //Logica para encontrar en base de datos
-        
-        return listaProductos;
+    private void refrescarTablaCompleta() {
+        ProductoControlador proCon = new ProductoControlador();
+        llenarTabla(proCon.listarTodosLosProductos());
     }
     
-    private void llenarTabla(ArrayList listaProductos){
-        // logica para llenar tabla con productos encontrados
-    
+    private void llenarTabla(ArrayList<Modelo.Producto> listaProductos) {
+        javax.swing.table.DefaultTableModel modelo = (javax.swing.table.DefaultTableModel) inventarioTable.getModel();
+        modelo.setRowCount(0);
+
+        if (listaProductos == null || listaProductos.isEmpty()) {
+            return;
+        }
+
+        for (Modelo.Producto prod : listaProductos) {
+            Object[] fila = new Object[6];
+            fila[0] = prod.getCodigo();          
+            fila[1] = prod.getTipo();            
+            fila[2] = prod.getMarca();           
+            fila[3] = String.format("%.2f", prod.getPrecio()); 
+            fila[4] = prod.getUnidad();          
+            fila[5] = prod.getStock();           
+
+            modelo.addRow(fila);
+        }
     }
     
     @SuppressWarnings("unchecked")
@@ -51,6 +64,7 @@ public class Ventas extends javax.swing.JFrame {
         ventaBtn = new javax.swing.JButton();
         historialBtn = new javax.swing.JButton();
         cerrarBtn = new javax.swing.JButton();
+        actualizarTableBtn = new javax.swing.JButton();
         imagenFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -63,12 +77,12 @@ public class Ventas extends javax.swing.JFrame {
         jLabel1.setFont(new java.awt.Font("Helvetica Neue", 1, 24)); // NOI18N
         jLabel1.setText("BIENVENIDO");
         Fondo.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 110, -1, -1));
-        Fondo.add(busquedaTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, 710, -1));
+        Fondo.add(busquedaTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, 590, -1));
 
         buscarBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         buscarBtn.setText("BUSCAR");
         buscarBtn.addActionListener(this::buscarBtnActionPerformed);
-        Fondo.add(buscarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 180, 140, -1));
+        Fondo.add(buscarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 180, 130, -1));
 
         jLabel2.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         jLabel2.setText("Busqueda de producto:");
@@ -112,6 +126,11 @@ public class Ventas extends javax.swing.JFrame {
         cerrarBtn.setText("Cerrar");
         Fondo.add(cerrarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 620, -1, 30));
 
+        actualizarTableBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
+        actualizarTableBtn.setText("ACTUALIZAR");
+        actualizarTableBtn.addActionListener(this::actualizarTableBtnActionPerformed);
+        Fondo.add(actualizarTableBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 180, 130, -1));
+
         imagenFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondoNuevo.png"))); // NOI18N
         Fondo.add(imagenFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1000, 700));
 
@@ -132,32 +151,64 @@ public class Ventas extends javax.swing.JFrame {
 
     private void ingresarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresarBtnActionPerformed
         ingresoProducto nuevoIngreso = new ingresoProducto();
-        nuevoIngreso.setVisible(true);
+        
+        nuevoIngreso.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                refrescarTablaCompleta();
+            }
+        });
+        
+        nuevoIngreso.setVisible(true);;
+        
     }//GEN-LAST:event_ingresarBtnActionPerformed
 
     private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed
-        String buscado = busquedaTxt.getText().trim().toLowerCase();
-        
-        
         // logica para obtener informacion de productos con nombre o tipo igual al ingresado
+        
+        String buscado = busquedaTxt.getText().trim().toLowerCase();
+        ProductoControlador proCon = new ProductoControlador();
+
+        if (buscado.isEmpty()) {
+            // Si el buscador está vacío, vuelve a mostrar todo el inventario
+            llenarTabla(proCon.listarTodosLosProductos());
+            busquedaTxt.setText(" ");
+        } else {
+            // Logica para filtrar por coincidencia de término
+            llenarTabla(proCon.buscarProductos(buscado));
+            busquedaTxt.setText(" ");
+        }
         
     }//GEN-LAST:event_buscarBtnActionPerformed
 
     private void actualizarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarBtnActionPerformed
-        try{
-            
+        try {
             actualizarInventario newActualizar = new actualizarInventario();
+            
+            newActualizar.addWindowListener(new java.awt.event.WindowAdapter() {
+                @Override
+                public void windowClosed(java.awt.event.WindowEvent e) {
+                    refrescarTablaCompleta();
+                }
+            });
+            
             newActualizar.setVisible(true);
             
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(this, "Error al abrir actualizacion", "Error",JOptionPane.ERROR_MESSAGE);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Error al abrir actualizacion", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_actualizarBtnActionPerformed
+
+    private void actualizarTableBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarTableBtnActionPerformed
+        refrescarTablaCompleta();
+        busquedaTxt.setText(" ");
+    }//GEN-LAST:event_actualizarTableBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Fondo;
     private javax.swing.JLabel Logo_ferreteria;
     private javax.swing.JButton actualizarBtn;
+    private javax.swing.JButton actualizarTableBtn;
     private javax.swing.JToggleButton buscarBtn;
     private javax.swing.JTextField busquedaTxt;
     private javax.swing.JButton cerrarBtn;

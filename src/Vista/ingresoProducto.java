@@ -179,6 +179,7 @@ public class ingresoProducto extends javax.swing.JFrame {
 
             if (proCon.registrarProducto(nuevoProducto)) { 
                 JOptionPane.showMessageDialog(this, "¡Producto registrado con éxito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                System.out.println("Producto registrado con exito: " + nuevoProducto.getTipo() + " " + nuevoProducto.getMarca());
                 vaciarCampos(); 
             } else {
                 JOptionPane.showMessageDialog(this, "Hubo un error al guardar el producto en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);

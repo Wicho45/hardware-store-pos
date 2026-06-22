@@ -2,10 +2,12 @@ package Vista;
 
 import javax.swing.JOptionPane;
 import java.util.ArrayList;
+import Controlador.ProductoControlador;
 
 public class actualizarInventario extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(actualizarInventario.class.getName());
+    private ArrayList<Modelo.Producto> listaActual = new ArrayList<>();
 
     public actualizarInventario() {
         initComponents();
@@ -13,45 +15,58 @@ public class actualizarInventario extends javax.swing.JFrame {
         this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         this.setResizable(false);
         this.setLocationRelativeTo(null);
+        
+        productoCbx.removeAllItems();
+        
         this.setVisible(true);
     }
     
-    public boolean verificarContenido(String buscado, String productoSeleccionado, String cantidad){
-    
-        if (buscado.isEmpty()){
-            JOptionPane.showMessageDialog(this, "Debe buscar un producto antes", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        
-        if(productoSeleccionado.isEmpty()){
-            JOptionPane.showMessageDialog(this, "Debe seleccionar un producto antes", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        
-        if(cantidad.isEmpty()){
-            JOptionPane.showMessageDialog(this, "Debe ingresar una cantidad antes", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        
-        
-        try{
-            
-            Integer.parseInt(cantidad);
-            
-        }catch(NumberFormatException e){
-            JOptionPane.showMessageDialog(this,"El campo de cantidad debe ser un numero exacto sin decimales", "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        
-        
-        return true;
-    };
-    
-    
-    public void llenarCombo(ArrayList productosEncontrados){
-        //Logica para llenar tabla con productos encontrados
-    }
+    public boolean verificarContenido(String buscado, int seleccionIdx, String cantidad) {
+            if (buscado.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debe buscar un producto antes", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
 
+            if (seleccionIdx == -1) {
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un producto del combo antes", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            if (cantidad.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Debe ingresar una cantidad antes", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            try {
+                int cantNum = Integer.parseInt(cantidad);
+                if (cantNum <= 0) {
+                    JOptionPane.showMessageDialog(this, "La cantidad a ingresar debe ser mayor a cero", "Error", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "El campo de cantidad debe ser un número exacto sin decimales", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+
+            return true;
+        }
+    
+    
+    public void llenarCombo(ArrayList<Modelo.Producto> productosEncontrados) {
+        productoCbx.removeAllItems();
+        this.listaActual = productosEncontrados; 
+        if (productosEncontrados == null || productosEncontrados.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No se encontraron productos con ese criterio", "Información", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        
+        for (Modelo.Producto prod : productosEncontrados) {
+            String item = "[CÓDIGO: " + prod.getCodigo() + "] - " + prod.getTipo() + " - " + prod.getMarca() + " (Stock actual: " + prod.getStock() + ")";
+            productoCbx.addItem(item);
+        }
+    }
+    
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -86,6 +101,7 @@ public class actualizarInventario extends javax.swing.JFrame {
 
         buscarBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         buscarBtn.setText("BUSCAR");
+        buscarBtn.addActionListener(this::buscarBtnActionPerformed);
         jPanel1.add(buscarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 90, -1, -1));
 
         productoCbx.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
@@ -125,26 +141,49 @@ public class actualizarInventario extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void actualizarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarBtnActionPerformed
-        try{
+        try {
+            String buscado = buscarTxt.getText().trim();
+            int seleccionIdx = productoCbx.getSelectedIndex();
+            String cantidadStr = cantidadTxt.getText().trim();
             
-            String buscado = buscarTxt.getText().trim().toLowerCase();
-            String productoSeleccionado = productoCbx.getSelectedItem().toString().trim().toLowerCase();
-            String cantidad = cantidadTxt.getText().trim();
-            
-            if(!verificarContenido(buscado, productoSeleccionado, cantidad)){
-                
+            // 1. Validar las entradas de texto y selección
+            if (!verificarContenido(buscado, java.lang.Integer.valueOf(seleccionIdx), cantidadStr)) {
+                return;
             }
             
+            // 2. Extraer el objeto real basado en la posición del ComboBox
+            Modelo.Producto productoSeleccionado = listaActual.get(seleccionIdx);
+            int cantidadASumar = Integer.parseInt(cantidadStr);
             
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(this, "Error al intentar actualizar el producto el producto", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+            // 3. Ejecutar la actualización en SQLite pasándole el código original
+            ProductoControlador proCon = new ProductoControlador();
+            if (proCon.sumarStockProducto(productoSeleccionado.getCodigo(), cantidadASumar)) {
+                JOptionPane.showMessageDialog(this, "¡Inventario actualizado con éxito!\nNuevo Stock: " + (productoSeleccionado.getStock() + cantidadASumar), "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose(); // Cierra el formulario para detonar el refresco inmediato en Ventas.java
+            } else {
+                JOptionPane.showMessageDialog(this, "No se pudo actualizar el stock en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+            
+        } catch (Exception e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error al actualizar inventario", e);
+            JOptionPane.showMessageDialog(this, "Error al intentar actualizar el producto", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }//GEN-LAST:event_actualizarBtnActionPerformed
 
     private void cancelarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarBtnActionPerformed
         this.dispose();
     }//GEN-LAST:event_cancelarBtnActionPerformed
+
+    private void buscarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buscarBtnActionPerformed
+        String criterio = buscarTxt.getText().trim().toLowerCase();
+        if (criterio.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor escriba un tipo o marca para buscar.", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        ProductoControlador proCon = new ProductoControlador();
+        llenarCombo(proCon.buscarProductos(criterio));
+    }//GEN-LAST:event_buscarBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton actualizarBtn;
