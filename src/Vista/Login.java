@@ -4,6 +4,9 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import javax.swing.JOptionPane;
 
+
+//Login solo para opciones de desarrollador, carga masiva, mantenimiento entre otros
+
 public class Login extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(Login.class.getName());

@@ -7,7 +7,9 @@
             <file>file:/Volumes/Informacion%20y%20Archivos/Repositorios%20Github/hardware-store-pos/src/Vista/Login.java</file>
             <file>file:/Volumes/Informacion%20y%20Archivos/Repositorios%20Github/hardware-store-pos/src/Vista/Ventas.java</file>
             <file>file:/Volumes/Informacion%20y%20Archivos/Repositorios%20Github/hardware-store-pos/src/Vista/ingresoProducto.java</file>
-            <file>file:/Volumes/Informacion%20y%20Archivos/Repositorios%20Github/hardware-store-pos/src/Modelo/Producto.java</file>
+            <file>file:/Volumes/Informacion%20y%20Archivos/Repositorios%20Github/hardware-store-pos/src/Vista/actualizarInventario.java</file>
+            <file>file:/Volumes/Informacion%20y%20Archivos/Repositorios%20Github/hardware-store-pos/src/Controlador/ConexionDb.java</file>
+            <file>file:/Volumes/Informacion%20y%20Archivos/Repositorios%20Github/hardware-store-pos/nbproject/project.properties</file>
         </group>
     </open-files>
 </project-private>

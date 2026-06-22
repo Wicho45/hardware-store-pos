@@ -3,20 +3,19 @@ package hardware.store.pos;
 import Vista.Ventas;
 import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
-import java.util.ArrayList;
-import Modelo.Producto;
+import Controlador.ConexionDb;
 
 public class HardwareStorePos {
 
 
     public static void main(String[] args) {
         
-        ArrayList<Producto> productos = new ArrayList<>();
+        ConexionDb.inicializarDb();
         
         SwingUtilities.invokeLater(() -> {
             try {
                 
-                Ventas ventanaVentas = new Ventas(productos);
+                Ventas ventanaVentas = new Ventas();
                 ventanaVentas.setVisible(true);
                 
             } catch (Exception e  ){

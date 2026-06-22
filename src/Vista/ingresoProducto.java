@@ -2,6 +2,7 @@ package Vista;
 
 import javax.swing.JOptionPane;
 import Modelo.Producto;
+import Controlador.ProductoControlador;
 
 public class ingresoProducto extends javax.swing.JFrame {
     
@@ -16,6 +17,7 @@ public class ingresoProducto extends javax.swing.JFrame {
         this.setVisible(true);
     }
     
+    //Validaciones de campos
     public boolean verificarContenido(String tipo, String marca, String unidad, String cantidad, String precio, String nivel){
     
         if (cantidad.isEmpty() || marca.isEmpty() || nivel.isEmpty() || precio.isEmpty() || tipo.isEmpty() || unidad.isEmpty()){
@@ -44,6 +46,17 @@ public class ingresoProducto extends javax.swing.JFrame {
   
         return true;
     };
+    
+    public void vaciarCampos(){
+    
+        tipoTxt.setText("");
+        marcaTxt.setText("");
+        unidadTxt.setText("");
+        cantidadTxt.setText("");
+        precioTxt.setText("");
+        nivelTxt.setText("");
+        
+    }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -136,45 +149,44 @@ public class ingresoProducto extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void ingresarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ingresarBtnActionPerformed
-        try{
-            
-        String tipo = tipoTxt.getText().trim().toLowerCase();
-        String marca = marcaTxt.getText().trim().toLowerCase();
-        String unidad = unidadTxt.getText().trim().toLowerCase();
-        String cantidad = cantidadTxt.getText().trim();
-        String precio = precioTxt.getText().trim();
-        String nivel = nivelTxt.getText().trim();
-        
-        if(!verificarContenido(tipo, marca, unidad, cantidad, precio, nivel)){
-            return;
-        }
-        
-        Producto nuevoProducto = new Producto();
-        
-        nuevoProducto.setStock(Integer.parseInt(cantidad));
-        nuevoProducto.setMarca(marca);
-        nuevoProducto.setNivelReorden(Integer.parseInt(nivel));
-        nuevoProducto.setPrecio(Double.parseDouble(precio));
-        nuevoProducto.setTipo(tipo);
-        nuevoProducto.setUnidad(unidad);
-        
-        //debug de prueba
-            System.out.println("Producto nuevo creado con nombre: " + nuevoProducto.getTipo() + " " + nuevoProducto.getMarca());
-        
-        //Logica para ingresar a base de datos SQLite como objeto producto
-        
-        cantidadTxt.setText("");
-        marcaTxt.setText("");
-        nivelTxt.setText("");
-        precioTxt.setText("");
-        tipoTxt.setText("");
-        unidadTxt.setText("");
-        
-        JOptionPane.showMessageDialog(this, "Éxito al registrar el producto", "Éxito", JOptionPane.OK_OPTION);
-            
-        }catch (Exception e){
-            JOptionPane.showMessageDialog(this, "Error al intentar registrar el producto", "Error", JOptionPane.ERROR_MESSAGE);
-            return;
+        try {
+            String tipo = tipoTxt.getText().trim().toLowerCase();
+            String marca = marcaTxt.getText().trim().toLowerCase();
+            String unidad = unidadTxt.getText().trim().toLowerCase();
+            String cantidad = cantidadTxt.getText().trim();
+            String precio = precioTxt.getText().trim();
+            String nivel = nivelTxt.getText().trim();
+
+            // 1. Validar que todo el contenido sea correcto
+            if (!verificarContenido(tipo, marca, unidad, cantidad, precio, nivel)) {
+                return;
+            }
+
+            // 2. Rellenar el Objeto Modelo
+            Producto nuevoProducto = new Producto();
+            nuevoProducto.setStock(Integer.parseInt(cantidad));
+            nuevoProducto.setMarca(marca);
+            nuevoProducto.setNivelReorden(Integer.parseInt(nivel));
+            nuevoProducto.setPrecio(Double.parseDouble(precio));
+            nuevoProducto.setTipo(tipo);
+            nuevoProducto.setUnidad(unidad);
+
+            // Debug de prueba en consola
+            System.out.println("Intentando registrar: " + nuevoProducto.getTipo() + " " + nuevoProducto.getMarca());
+
+            // 3. Enviar el objeto completo al Controlador
+            ProductoControlador proCon = new ProductoControlador();
+
+            if (proCon.registrarProducto(nuevoProducto)) { 
+                JOptionPane.showMessageDialog(this, "¡Producto registrado con éxito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                vaciarCampos(); 
+            } else {
+                JOptionPane.showMessageDialog(this, "Hubo un error al guardar el producto en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } catch (Exception e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error en la interfaz al registrar", e);
+            JOptionPane.showMessageDialog(this, "Error al intentar registrar el producto: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         
         
