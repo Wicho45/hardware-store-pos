@@ -109,4 +109,20 @@ public class ProductoControlador {
         }
     }
     
+    // Resta la cantidad vendida al stock actual de SQLite
+    public boolean restarStockProducto(String codigo, int cantidadAVender) {
+        String sql = "UPDATE productos SET stock = stock - ? WHERE id = ?";
+        try (java.sql.Connection conn = ConexionDb.obtenerConexion();
+             java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, cantidadAVender);
+            ps.setInt(2, Integer.parseInt(codigo));
+            return ps.executeUpdate() > 0;
+
+        } catch (java.sql.SQLException e) {
+            System.out.println("Error al restar stock: " + e.getMessage());
+            return false;
+        }
+    }
+    
 }

@@ -116,6 +116,7 @@ public class Ventas extends javax.swing.JFrame {
         ventaBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         ventaBtn.setText("Venta");
         ventaBtn.setToolTipText("");
+        ventaBtn.addActionListener(this::ventaBtnActionPerformed);
         Fondo.add(ventaBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 620, -1, -1));
 
         historialBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
@@ -124,6 +125,7 @@ public class Ventas extends javax.swing.JFrame {
 
         cerrarBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         cerrarBtn.setText("Cerrar");
+        cerrarBtn.addActionListener(this::cerrarBtnActionPerformed);
         Fondo.add(cerrarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 620, -1, 30));
 
         actualizarTableBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
@@ -172,11 +174,11 @@ public class Ventas extends javax.swing.JFrame {
         if (buscado.isEmpty()) {
             // Si el buscador está vacío, vuelve a mostrar todo el inventario
             llenarTabla(proCon.listarTodosLosProductos());
-            busquedaTxt.setText(" ");
+            busquedaTxt.setText("");
         } else {
             // Logica para filtrar por coincidencia de término
             llenarTabla(proCon.buscarProductos(buscado));
-            busquedaTxt.setText(" ");
+            busquedaTxt.setText("");
         }
         
     }//GEN-LAST:event_buscarBtnActionPerformed
@@ -201,8 +203,25 @@ public class Ventas extends javax.swing.JFrame {
 
     private void actualizarTableBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_actualizarTableBtnActionPerformed
         refrescarTablaCompleta();
-        busquedaTxt.setText(" ");
+        busquedaTxt.setText("");
     }//GEN-LAST:event_actualizarTableBtnActionPerformed
+
+    private void cerrarBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cerrarBtnActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_cerrarBtnActionPerformed
+
+    private void ventaBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ventaBtnActionPerformed
+        formVenta newForm = new formVenta();
+        
+        newForm.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                refrescarTablaCompleta();
+            }
+        });
+        
+        newForm.setVisible(true);
+    }//GEN-LAST:event_ventaBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Fondo;
