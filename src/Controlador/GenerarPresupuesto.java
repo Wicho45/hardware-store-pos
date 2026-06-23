@@ -48,7 +48,7 @@ public class GenerarPresupuesto {
                 URL urlLogo = GenerarPresupuesto.class.getResource("/Imagenes/logo_ferre.png");
                 if (urlLogo != null) {
                     Image logo = Image.getInstance(urlLogo);
-                    logo.scaleToFit(110, 60);
+                    logo.scaleToFit(165, 90);
                     logo.setAlignment(Image.ALIGN_RIGHT);
                     celdaLogo.addElement(logo);
                 }
@@ -65,7 +65,6 @@ public class GenerarPresupuesto {
             documento.add(new Paragraph("Nota: Este documento no representa un comprobante de pago y está sujeto a cambios de precio.", fuenteNormal));
             documento.add(new Paragraph(" "));
 
-            // --- TABLA REAJUSTADA A 6 COLUMNAS ---
             PdfPTable tabla = new PdfPTable(6);
             tabla.setWidthPercentage(100);
             tabla.setWidths(new float[]{2.2f, 1.3f, 0.9f, 1.1f, 0.9f, 1.2f});
@@ -104,7 +103,7 @@ public class GenerarPresupuesto {
             documento.add(totalParagraph);
             
             documento.add(new Paragraph(" "));
-            Paragraph validez = new Paragraph("Precios válidos por 15 días a partir de la fecha de emisión.", fuenteNormal);
+            Paragraph validez = new Paragraph("Gracias por su preferencia.", fuenteNormal);
             validez.setAlignment(Paragraph.ALIGN_CENTER);
             documento.add(validez);
 

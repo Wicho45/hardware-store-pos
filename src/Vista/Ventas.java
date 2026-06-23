@@ -121,6 +121,7 @@ public class Ventas extends javax.swing.JFrame {
 
         historialBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         historialBtn.setText("Historial de ventas");
+        historialBtn.addActionListener(this::historialBtnActionPerformed);
         Fondo.add(historialBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 620, -1, -1));
 
         cerrarBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
@@ -222,6 +223,27 @@ public class Ventas extends javax.swing.JFrame {
         
         newForm.setVisible(true);
     }//GEN-LAST:event_ventaBtnActionPerformed
+
+    private void historialBtnActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_historialBtnActionPerformed
+        try {
+        historialVentas ventanaHistorial = new historialVentas();
+        
+        ventanaHistorial.toFront();
+        ventanaHistorial.repaint();
+        
+        ventanaHistorial.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosed(java.awt.event.WindowEvent e) {
+                refrescarTablaCompleta();
+            }
+        });
+        
+    } catch (Exception e) {
+        logger.log(java.util.logging.Level.SEVERE, "Error al abrir el historial de ventas", e);
+        javax.swing.JOptionPane.showMessageDialog(this, 
+                "Error al abrir el historial de ventas", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    }
+    }//GEN-LAST:event_historialBtnActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel Fondo;

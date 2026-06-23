@@ -27,7 +27,6 @@ public class formVenta extends javax.swing.JFrame {
     }
 
     private void configurarSpinner(int maxStock) {
-        // Configura el spinner: valor inicial 0, mínimo 0, máximo stock disponible, paso 1
         int max = maxStock > 0 ? maxStock : 0;
         SpinnerNumberModel model = new SpinnerNumberModel(0, 0, max, 1);
         cantidadSpn.setModel(model);
@@ -45,7 +44,7 @@ public class formVenta extends javax.swing.JFrame {
         double totalAcumulado = 0.0;
 
         for (DetalleVenta dv : carritoResumen) {
-            Object[] fila = new Object[6]; // Ahora son 6 columnas físicas en el JTable
+            Object[] fila = new Object[6]; 
             fila[0] = dv.getProducto().getTipo();
             fila[1] = dv.getProducto().getMarca();
             fila[2] = dv.getProducto().getUnidad();
@@ -63,7 +62,7 @@ public class formVenta extends javax.swing.JFrame {
             filaTotal[1] = "";
             filaTotal[2] = "";
             filaTotal[3] = "";
-            filaTotal[4] = ""; // Celda vacía bajo la columna cantidad
+            filaTotal[4] = ""; 
             filaTotal[5] = String.format("%.2f", totalAcumulado);
             modelo.addRow(filaTotal);
         }
@@ -80,22 +79,14 @@ private void despacharEImprimirPdf(String rutaArchivo) {
         String os = System.getProperty("os.name").toLowerCase();
 
         if (os.contains("win")) {
-            // --- LOGICA EXCLUSIVA Y SEGURA PARA WINDOWS ---
-            // Ejecuta de forma nativa el comando de apertura de Windows (cmd /c start)
-            // Esto evita que Swing se congele si Windows tarda en reaccionar.
             String comando = "cmd /c start \"\" \"" + pdfFile.getAbsolutePath() + "\"";
             Runtime.getRuntime().exec(comando);
             
-            // Nota para producción: Para mandar a imprimir directo en Windows sin abrir,
-            // se suele usar: Runtime.getRuntime().exec("rundll32.exe mshtml.dll,PrintHTML \"" + pdfFile.getAbsolutePath() + "\"");
-            // Pero dejar que Windows lo abra y el usuario le dé 'Imprimir' desde su visor de PDFs (Adobe/Edge) es lo más seguro.
             
         } else if (java.awt.Desktop.isDesktopSupported()) {
-            // --- LOGICA PARA MAC / LINUX ---
             java.awt.Desktop desktop = java.awt.Desktop.getDesktop();
             desktop.open(pdfFile);
             
-            // En Mac la cola de impresión por defecto no congela el hilo de la app
             if (desktop.isSupported(java.awt.Desktop.Action.PRINT)) {
                 desktop.print(pdfFile);
             }
@@ -147,7 +138,7 @@ private void despacharEImprimirPdf(String rutaArchivo) {
         buscarBtn.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
         buscarBtn.setText("BUSCAR");
         buscarBtn.addActionListener(this::buscarBtnActionPerformed);
-        jPanel1.add(buscarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 90, -1, -1));
+        jPanel1.add(buscarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(463, 90, 110, -1));
 
         productosCbx.addActionListener(this::productosCbxActionPerformed);
         jPanel1.add(productosCbx, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 160, 420, -1));
@@ -239,7 +230,7 @@ private void despacharEImprimirPdf(String rutaArchivo) {
         int idx = productosCbx.getSelectedIndex();
         if (idx != -1) {
             Producto seleccionado = productosBuscados.get(idx);
-            configurarSpinner(seleccionado.getStock()); // Ajusta el techo del spinner según el stock real
+            configurarSpinner(seleccionado.getStock()); 
         }
     }//GEN-LAST:event_productosCbxActionPerformed
 
@@ -257,6 +248,7 @@ private void despacharEImprimirPdf(String rutaArchivo) {
         boolean exitoCompleto = true;
         StringBuilder advertencias = new StringBuilder();
         
+        // 1. Descontar las existencias físicas del inventario
         for (DetalleVenta dv : carritoResumen) {
             String codigo = dv.getProducto().getCodigo();
             int cantidadVendida = dv.getCantidad();
@@ -273,17 +265,17 @@ private void despacharEImprimirPdf(String rutaArchivo) {
         }
         
         if (exitoCompleto) {
-            // Instanciar y armar el Objeto de Encabezado de Venta
             String fechaActual = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
             Venta nuevaVenta = new Venta();
             nuevaVenta.setFecha(fechaActual);
             nuevaVenta.setTipoComprobante("VENTA EFECTUADA");
-            nuevaVenta.setDetalles(carritoResumen); // Esto calcula el total de forma automática
+            nuevaVenta.setDetalles(carritoResumen); 
             
-            // Definir nombre del archivo destino
+            // 2. Persistir transacción unificada en el historial de la DB SQLite
+            proCon.guardarVentaCompleta(nuevaVenta);
+            
             String nombreArchivo = "Factura_Venta_" + System.currentTimeMillis() + ".pdf";
             
-            // Ejecutar la generación del PDF con OpenPDF
             GenerarFactura.emitirDocumentoPdf(nuevaVenta, nombreArchivo);
             
             JOptionPane.showMessageDialog(this, "¡Venta procesada con éxito!", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -292,7 +284,6 @@ private void despacharEImprimirPdf(String rutaArchivo) {
                 JOptionPane.showMessageDialog(this, "Poco producto disponible:\n" + advertencias.toString(), "Advertencia de Stock", JOptionPane.WARNING_MESSAGE);
             }
             
-            // Lanzar visualización e impresión automatizada
             despacharEImprimirPdf(nombreArchivo);
             
             carritoResumen.clear();
@@ -308,7 +299,6 @@ private void despacharEImprimirPdf(String rutaArchivo) {
             return;
         }
         
-        // Armar el Objeto Venta enfocado en Cotización (No altera la base de datos)
         String fechaActual = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date());
         Venta cotizacion = new Venta();
         cotizacion.setFecha(fechaActual);
@@ -320,7 +310,6 @@ private void despacharEImprimirPdf(String rutaArchivo) {
         
         JOptionPane.showMessageDialog(this, "¡Presupuesto generado con éxito!", "Cotización", JOptionPane.INFORMATION_MESSAGE);
         
-        // Lanzar visualización e impresión automatizada
         despacharEImprimirPdf(nombreArchivo);
         
         carritoResumen.clear();
@@ -342,8 +331,28 @@ private void despacharEImprimirPdf(String rutaArchivo) {
         
         Producto prodSeleccionado = productosBuscados.get(idx);
         
-        DetalleVenta nuevoDetalle = new DetalleVenta(prodSeleccionado, cantidad);
-        carritoResumen.add(nuevoDetalle);
+        boolean productoDuplicado = false;
+        for (DetalleVenta dv : carritoResumen) {
+            if (dv.getProducto().getCodigo().equals(prodSeleccionado.getCodigo())) {
+                int nuevaCantidadTotal = dv.getCantidad() + cantidad;
+                
+                // Validar que no supere el stock físico actual
+                if (nuevaCantidadTotal > prodSeleccionado.getStock()) {
+                    JOptionPane.showMessageDialog(this, "No puede agregar más unidades de las disponibles en el inventario físico.", "Stock Excedido", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                
+                dv.setCantidad(nuevaCantidadTotal);
+                productoDuplicado = true;
+                break;
+            }
+        }
+        
+        if (!productoDuplicado) {
+            DetalleVenta nuevoDetalle = new DetalleVenta(prodSeleccionado, cantidad);
+            carritoResumen.add(nuevoDetalle);
+        }
+        
         pintarTablaResumen();
         
         buscarTxt.setText("");

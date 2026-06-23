@@ -21,22 +21,25 @@ public class actualizarInventario extends javax.swing.JFrame {
         this.setVisible(true);
     }
     
-    public boolean verificarContenido(String buscado, int seleccionIdx, String cantidad) {
-            if (buscado.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Debe buscar un producto antes", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
+    public boolean verificarContenido(String buscado, int seleccionIdx, String cantidad, String precio) {
+        if (buscado.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe buscar un producto antes", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
-            if (seleccionIdx == -1) {
-                JOptionPane.showMessageDialog(this, "Debe seleccionar un producto del combo antes", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
+        if (seleccionIdx == -1) {
+            JOptionPane.showMessageDialog(this, "Debe seleccionar un producto del combo antes", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
-            if (cantidad.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "Debe ingresar una cantidad antes", "Error", JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
+        // Validación crítica: Verificar que al menos uno de los campos contenga datos
+        if (cantidad.isEmpty() && precio.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Debe rellenar al menos un campo: Cantidad o Nuevo Precio.", "Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
 
+        // Verificar formato de la cantidad si no viene vacía
+        if (!cantidad.isEmpty()) {
             try {
                 int cantNum = Integer.parseInt(cantidad);
                 if (cantNum <= 0) {
@@ -47,9 +50,24 @@ public class actualizarInventario extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(this, "El campo de cantidad debe ser un número exacto sin decimales", "Error", JOptionPane.ERROR_MESSAGE);
                 return false;
             }
-
-            return true;
         }
+
+        // Verificar formato del precio si no viene vacío
+        if (!precio.isEmpty()) {
+            try {
+                double precioNum = Double.parseDouble(precio);
+                if (precioNum <= 0.0) {
+                    JOptionPane.showMessageDialog(this, "El nuevo precio debe ser mayor a cero", "Error", JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "El precio debe contener un formato numérico válido. Ejemplo: 25.50", "Error", JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        }
+
+        return true;
+    }
     
     
     public void llenarCombo(ArrayList<Modelo.Producto> productosEncontrados) {
@@ -61,7 +79,7 @@ public class actualizarInventario extends javax.swing.JFrame {
         }
         
         for (Modelo.Producto prod : productosEncontrados) {
-            String item = "[CÓDIGO: " + prod.getCodigo() + "] - " + prod.getTipo() + " - " + prod.getMarca() + " (Stock actual: " + prod.getStock() + ")";
+            String item = "[CÓDIGO: " + prod.getCodigo() + "] - " + prod.getTipo() + " - " + prod.getMarca() + " (Stock: " + prod.getStock() + " | Precio: Q" + String.format("%.2f", prod.getPrecio()) + ")";
             productoCbx.addItem(item);
         }
     }
@@ -81,10 +99,11 @@ public class actualizarInventario extends javax.swing.JFrame {
         cancelarBtn = new javax.swing.JButton();
         cantidadTxt = new javax.swing.JTextField();
         jLabel4 = new javax.swing.JLabel();
-        jLabel1 = new javax.swing.JLabel();
+        nuevoPrecioTxt = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jLabel5 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(450, 340));
 
         jPanel1.setPreferredSize(new java.awt.Dimension(450, 320));
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -110,19 +129,24 @@ public class actualizarInventario extends javax.swing.JFrame {
         actualizarBtn.setText("ACTUALIZAR");
         actualizarBtn.setToolTipText("");
         actualizarBtn.addActionListener(this::actualizarBtnActionPerformed);
-        jPanel1.add(actualizarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 260, -1, 30));
+        jPanel1.add(actualizarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 370, -1, 30));
 
         cancelarBtn.setText("CANCELAR");
         cancelarBtn.addActionListener(this::cancelarBtnActionPerformed);
-        jPanel1.add(cancelarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 260, -1, -1));
+        jPanel1.add(cancelarBtn, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 370, -1, -1));
         jPanel1.add(cantidadTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 400, -1));
 
         jLabel4.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
-        jLabel4.setText("CANTIDAD QUE INGRESA");
+        jLabel4.setText("ANTIDAD QUE INGRESA:");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, -1));
+        jPanel1.add(nuevoPrecioTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 290, 400, -1));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondo.png"))); // NOI18N
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 450, 320));
+        jLabel6.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
+        jLabel6.setText("NUEVO PRECIO:");
+        jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 260, -1, -1));
+
+        jLabel5.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Imagenes/fondoNuevo.png"))); // NOI18N
+        jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 450, 430));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -134,7 +158,7 @@ public class actualizarInventario extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 430, Short.MAX_VALUE)
         );
 
         pack();
@@ -145,23 +169,31 @@ public class actualizarInventario extends javax.swing.JFrame {
             String buscado = buscarTxt.getText().trim();
             int seleccionIdx = productoCbx.getSelectedIndex();
             String cantidadStr = cantidadTxt.getText().trim();
+            String precioStr = nuevoPrecioTxt.getText().trim();
             
-            // 1. Validar las entradas de texto y selección
-            if (!verificarContenido(buscado, java.lang.Integer.valueOf(seleccionIdx), cantidadStr)) {
+            // 1. Validar entradas incluyendo el nuevo parámetro de precio
+            if (!verificarContenido(buscado, seleccionIdx, cantidadStr, precioStr)) {
                 return;
             }
             
-            // 2. Extraer el objeto real basado en la posición del ComboBox
             Modelo.Producto productoSeleccionado = listaActual.get(seleccionIdx);
-            int cantidadASumar = Integer.parseInt(cantidadStr);
             
-            // 3. Ejecutar la actualización en SQLite pasándole el código original
+            // 2. Determinar valores por defecto si vienen vacíos
+            int cantidadASumar = cantidadStr.isEmpty() ? 0 : Integer.parseInt(cantidadStr);
+            double nuevoPrecio = precioStr.isEmpty() ? 0.0 : Double.parseDouble(precioStr);
+            
+            // 3. Ejecutar la consulta flexible en el controlador
             ProductoControlador proCon = new ProductoControlador();
-            if (proCon.sumarStockProducto(productoSeleccionado.getCodigo(), cantidadASumar)) {
-                JOptionPane.showMessageDialog(this, "¡Inventario actualizado con éxito!\nNuevo Stock: " + (productoSeleccionado.getStock() + cantidadASumar), "Éxito", JOptionPane.INFORMATION_MESSAGE);
-                this.dispose(); // Cierra el formulario para detonar el refresco inmediato en Ventas.java
+            if (proCon.actualizarInventarioPrecio(productoSeleccionado.getCodigo(), cantidadASumar, nuevoPrecio)) {
+                
+                String msg = "¡Inventario actualizado con éxito!\n";
+                if (cantidadASumar > 0) msg += "Nuevo Stock: " + (productoSeleccionado.getStock() + cantidadASumar) + "\n";
+                if (nuevoPrecio > 0.0) msg += "Nuevo Precio: Q" + String.format("%.2f", nuevoPrecio);
+                
+                JOptionPane.showMessageDialog(this, msg, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose(); 
             } else {
-                JOptionPane.showMessageDialog(this, "No se pudo actualizar el stock en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(this, "No se pudo actualizar el registro en la base de datos.", "Error", JOptionPane.ERROR_MESSAGE);
             }
             
         } catch (Exception e) {
@@ -191,11 +223,13 @@ public class actualizarInventario extends javax.swing.JFrame {
     private javax.swing.JTextField buscarTxt;
     private javax.swing.JButton cancelarBtn;
     private javax.swing.JTextField cantidadTxt;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JTextField nuevoPrecioTxt;
     private javax.swing.JComboBox<String> productoCbx;
     // End of variables declaration//GEN-END:variables
 }
