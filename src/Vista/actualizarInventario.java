@@ -137,7 +137,7 @@ public class actualizarInventario extends javax.swing.JFrame {
         jPanel1.add(cantidadTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 400, -1));
 
         jLabel4.setFont(new java.awt.Font("Helvetica Neue", 1, 14)); // NOI18N
-        jLabel4.setText("ANTIDAD QUE INGRESA:");
+        jLabel4.setText("CANTIDAD QUE INGRESA:");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 180, -1, -1));
         jPanel1.add(nuevoPrecioTxt, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 290, 400, -1));
 
